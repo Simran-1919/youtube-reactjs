@@ -1,6 +1,7 @@
+import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { API_KEY } from '../../../data'
+import { API_KEY, value_converter } from '../../../data'
 import './Feed.css'
 
 const Feed = ({ category }) => {
@@ -8,9 +9,9 @@ const Feed = ({ category }) => {
     const [data, setData] = useState([]);
 
     const fetchData = async () => {
-        const videoList_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=50&regionCode=US&videoCategoryId=0&key=${API_KEY}`
+        const videoList_url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxWidth=50&regionCode=US&videoCategoryId=${category}&key=${API_KEY}`;
 
-        await fetch(videoList_url).then(response => response.json()).then(data => {console.log("data",data.items);setData(data.items)})
+        await fetch(videoList_url).then(response => response.json()).then(data => setData(data.items));
     }
 
     useEffect(() => {
@@ -25,8 +26,8 @@ const Feed = ({ category }) => {
                     <Link to={`video/${item.snippet.categoryId}/${item.id}`} className='card'>
                         <img src={item.snippet.thumbnails.medium.url} alt="" />
                         <h2>{item.snippet.title}</h2>
-                        <h3>Greatstack</h3>
-                        <p>15k views &bull; 2 days ago</p>
+                        <h3>{item.snippet.channelTitle}</h3>
+                        <p>{value_converter(item.statistics.viewCount)}views &bull; {moment(item.snippet.publishedAt).fromNow()}</p>
                     </Link>
                 )
             })}
